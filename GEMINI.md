@@ -3,8 +3,9 @@
 Auto-generated from all feature plans. Last updated: 2026-01-27
 
 ## Active Technologies
-- Node.js 24+ + Fastify, BullMQ, Redis, Prisma, @octokit/webhooks-methods (001-github-event-ingestion)
-- PostgreSQL (001-github-event-ingestion)
+- Node.js 25+ (Chainguard images: cgr.dev/chainguard/node)
+- Fastify, BullMQ, Redis, Prisma, @octokit/webhooks-methods
+- PostgreSQL (Supabase / Local Docker)
 
 ## Project Structure
 

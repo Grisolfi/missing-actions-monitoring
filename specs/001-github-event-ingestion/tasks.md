@@ -9,9 +9,10 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure: `backend/src/{api,models,services,utils}`, `backend/prisma`, `backend/tests/{contract,integration,load}`
-- [ ] T002 [P] Initialize Node.js 24 project in `backend/` and install dependencies (fastify, bullmq, prisma, @octokit/webhooks-methods)
-- [ ] T003 [P] Configure TypeScript and ESLint for the backend
+- [x] T001 Create project structure: `backend/src/{api,models,services,utils}`, `backend/prisma`, `backend/tests/{contract,integration,load}`
+- [x] T002 [P] Initialize Node.js 24 project in `backend/` and install dependencies (fastify, bullmq, prisma, @octokit/webhooks-methods)
+- [x] T003 [P] Configure TypeScript and ESLint for the backend
+- [x] T023 [P] Setup Dockerfile for backend and `compose.yml` for local development (PostgreSQL + Redis)
 
 ---
 
@@ -19,10 +20,10 @@
 
 **Purpose**: Core infrastructure for event-driven architecture
 
-- [ ] T004 Setup Prisma schema with `WebhookEvent`, `WorkflowRun`, and `WorkflowJob` models (include unique `externalId` and `status` enum) in `backend/prisma/schema.prisma`
-- [ ] T005 [P] Setup Redis and BullMQ connection utility in `backend/src/services/queue.ts`
-- [ ] T006 [P] Configure Fastify server with global error handling (structured logging of failed requests) and pino logging in `backend/src/api/server.ts`
-- [ ] T007 Implement signature verification and idempotency check utilities in `backend/src/utils/github-webhook.ts`
+- [x] T004 Setup Prisma schema with `WebhookEvent`, `WorkflowRun`, and `WorkflowJob` models (include unique `externalId` and `status` enum) in `backend/prisma/schema.prisma`
+- [x] T005 [P] Setup Redis and BullMQ connection utility in `backend/src/services/queue.ts`
+- [x] T006 [P] Configure Fastify server with global error handling (structured logging of failed requests) and pino logging in `backend/src/api/server.ts`
+- [x] T007 Implement signature verification and idempotency check utilities in `backend/src/utils/github-webhook.ts`
 
 ---
 
@@ -34,11 +35,11 @@
 Send a mock GitHub webhook with a unique `X-GitHub-Delivery` ID twice. Verify first call returns 202 and second call returns 202 but skips processing (status `SKIPPED_DUPLICATE`).
 
 ### Implementation for User Story 1
-- [ ] T008 [P] [US1] Implement `WebhookEvent` model CRUD (with uniqueness check) in `backend/src/models/event.ts`
-- [ ] T009 [US1] Create Fastify route `POST /webhooks/github` that validates signature, headers, and performs idempotency check in `backend/src/api/routes/webhooks.ts`
-- [ ] T010 [US1] Add event persistence to the webhook route (Store raw payload with `PENDING` status)
-- [ ] T011 [US1] Add BullMQ producer to the webhook route (Queue event ID for processing)
-- [ ] T012 [US1] Integration test: Sending mock webhook results in 202 and event in DB with `PENDING` status in `backend/tests/integration/ingestion.test.ts`
+- [x] T008 [P] [US1] Implement `WebhookEvent` model CRUD (with uniqueness check) in `backend/src/models/event.ts`
+- [x] T009 [US1] Create Fastify route `POST /webhooks/github` that validates signature, headers, and performs idempotency check in `backend/src/api/routes/webhooks.ts`
+- [x] T010 [US1] Add event persistence to the webhook route (Store raw payload with `PENDING` status)
+- [x] T011 [US1] Add BullMQ producer to the webhook route (Queue event ID for processing)
+- [x] T012 [US1] Integration test: Sending mock webhook results in 202 and event in DB with `PENDING` status in `backend/tests/integration/ingestion.test.ts`
 
 ---
 
@@ -50,10 +51,10 @@ Send a mock GitHub webhook with a unique `X-GitHub-Delivery` ID twice. Verify fi
 Mock a failure in the `WorkflowJob` update. Send a `job_completed` event. Verify that the `WorkflowRun` duration is NOT updated (rollback) and the job remains `PENDING` in the queue for retry.
 
 ### Implementation for User Story 2
-- [ ] T013 [P] [US2] Implement BullMQ worker to consume event IDs from the queue in `backend/src/services/worker.ts`
-- [ ] T014 [US2] Implement workflow processing logic using Prisma `$transaction` to update Run and Job states atomically in `backend/src/services/processor.ts`
-- [ ] T015 [US2] Add concurrency configuration to BullMQ worker to handle bursts (at least 50/sec)
-- [ ] T016 [US2] Load test: Verify 50+ event/sec throughput with acknowledgment under 200ms in `backend/tests/load/ingestion-load.yml`
+- [x] T013 [P] [US2] Implement BullMQ worker to consume event IDs from the queue in `backend/src/services/worker.ts`
+- [x] T014 [US2] Implement workflow processing logic using Prisma `$transaction` to update Run and Job states atomically in `backend/src/services/processor.ts`
+- [x] T015 [US2] Add concurrency configuration to BullMQ worker to handle bursts (at least 50/sec)
+- [x] T016 [US2] Load test: Verify 50+ event/sec throughput with acknowledgment under 200ms in `backend/tests/load/ingestion-load.yml`
 
 ---
 
@@ -65,17 +66,17 @@ Mock a failure in the `WorkflowJob` update. Send a `job_completed` event. Verify
 Manually set a `WebhookEvent` received timestamp to 31 days ago. Run the cleanup worker and verify the record is deleted.
 
 ### Implementation for User Story 3
-- [ ] T017 [P] [US3] Configure BullMQ retry policy with exponential backoff for processing failures
-- [ ] T018 [US3] Implement failure handling: Mark `WebhookEvent` as `FAILED` and store error details in the database after final retry
-- [ ] T019 [US3] Implement daily cleanup worker for `WebhookEvent` records older than 30 days in `backend/src/services/cleanup.ts`
-- [ ] T020 [US3] Resiliency test: Verify processing resumes correctly after database reconnection in `backend/tests/integration/resiliency.test.ts`
+- [x] T017 [P] [US3] Configure BullMQ retry policy with exponential backoff for processing failures
+- [x] T018 [US3] Implement failure handling: Mark `WebhookEvent` as `FAILED` and store error details in the database after final retry
+- [x] T019 [US3] Implement daily cleanup worker for `WebhookEvent` records older than 30 days in `backend/src/services/cleanup.ts`
+- [x] T020 [US3] Resiliency test: Verify processing resumes correctly after database reconnection in `backend/tests/integration/resiliency.test.ts`
 
 ---
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T021 [P] Add detailed structured logging (trace IDs) across API and Workers
-- [ ] T022 Finalize `README.md` and `quickstart.md` with final API and deployment details
+- [x] T021 [P] Create `walkthrough.md` with implementation details and test results
+- [x] T022 Update `README.md` with ingestion setup instructions
 
 ---
 
