@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WebhookEventStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  SKIPPED_DUPLICATE
+}
+
+model WebhookEvent {
+  id          String             @id @default(uuid()) @db.Uuid
+  externalId  String             @unique // GitHub Delivery ID
+  eventType   String
+  payload     Json
+  status      WebhookEventStatus @default(PENDING)
+  error       String?            @db.Text
+  receivedAt  DateTime           @default(now())
+  processedAt DateTime?
+
+  @@index([externalId])
+}
+
+model WorkflowRun {
+  id             BigInt        @id // GitHub Run ID
+  repositoryName String
+  workflowName   String
+  status         String
+  conclusion     String?
+  startedAt      DateTime
+  completedAt    DateTime?
+  duration       Int?          // Seconds
+  waitTime       Int?          // Seconds
+  jobs           WorkflowJob[]
+}
+
+model WorkflowJob {
+  id          BigInt      @id // GitHub Job ID
+  runId       BigInt
+  run         WorkflowRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  name        String
+  status      String
+  conclusion  String?
+  startedAt   DateTime
+  completedAt DateTime?
+}
