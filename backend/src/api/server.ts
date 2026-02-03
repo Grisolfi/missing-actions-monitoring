@@ -41,9 +41,8 @@ await server.register(authPlugin);
 
 // Register Routes
 server.register(webhookRoutes, { prefix: '/webhooks' });
-server.register(dashboardRoutes, {
-    prefix: '/api/dashboard',
-    preHandler: [server.authenticate]
+await server.register(dashboardRoutes, {
+    prefix: '/api/dashboard'
 });
 
 // Health Check

@@ -1,18 +1,16 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 import { env } from '../utils/env.js';
+import createError from '@fastify/error';
+
+const UnauthorizedError = createError('FST_UNAUTHORIZED', 'Invalid or missing API Key', 401);
 
 export default fp(async function authPlugin(fastify: FastifyInstance) {
     fastify.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
         const apiKey = request.headers['x-api-key'];
 
         if (!apiKey || apiKey !== env.DASHBOARD_API_KEY) {
-            reply.status(401).send({
-                error: 'Unauthorized',
-                message: 'Invalid or missing API Key',
-                statusCode: 401
-            });
-            return;
+            throw new UnauthorizedError();
         }
     });
 });
