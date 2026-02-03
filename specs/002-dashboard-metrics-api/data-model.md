@@ -4,7 +4,7 @@
 
 The dashboard implementation requires high-performance filtering over time and repository. We will add indexes to the following models.
 
-### [WorkflowRun](file:///home/grisolfi/Dev/missing-actions-monitoring/backend/prisma/schema.prisma#L32)
+### [WorkflowRun](../../backend/prisma/schema.prisma#L32)
 
 | Field | Type | Note |
 |-------|------|------|
@@ -15,7 +15,7 @@ The dashboard implementation requires high-performance filtering over time and r
 | duration | Int? | Aggregated (Seconds) |
 | waitTime | Int? | Aggregated (Seconds) |
 
-### [WorkflowJob](file:///home/grisolfi/Dev/missing-actions-monitoring/backend/prisma/schema.prisma#L45)
+### [WorkflowJob](../../backend/prisma/schema.prisma#L45)
 
 | Field | Type | Note |
 |-------|------|------|

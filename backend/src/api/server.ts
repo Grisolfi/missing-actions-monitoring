@@ -1,7 +1,6 @@
 import Fastify, { FastifyError } from 'fastify';
 import helmet from '@fastify/helmet';
 import cors from '@fastify/cors';
-import rateLimit from '@fastify/rate-limit';
 import { env } from '../utils/env.js';
 import authPlugin from '../plugins/auth.js';
 import webhookRoutes from './routes/webhooks.js';
@@ -9,8 +8,7 @@ import dashboardRoutes from './routes/dashboard.js';
 import { worker as bullWorker } from '../services/worker.js';
 import { cleanupWorker, scheduleDailyCleanup } from '../services/cleanup.js';
 import { prisma } from '../models/prisma.js';
-import { queueConnection, redisOptions } from '../services/queue.js';
-import { Redis } from 'ioredis';
+import { queueConnection } from '../services/queue.js';
 import { analytics } from '../services/analytics.js';
 import cluster from 'node:cluster';
 import { availableParallelism } from 'node:os';
@@ -96,7 +94,6 @@ const gracefulShutdown = async (signal: string) => {
         await bullWorker.close();
         await cleanupWorker.close();
         await queueConnection.quit();
-        // Redis for rate limit is internal to its registration or managed here if we had a ref
         process.exit(0);
     } catch (err) {
         server.log.error(err, 'Error during graceful shutdown');

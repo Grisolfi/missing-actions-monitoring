@@ -5,8 +5,7 @@ import { Prisma } from '@prisma/client';
 
 export default async function dashboardRoutes(fastify: FastifyInstance) {
     fastify.get('/summary', {
-        schema: dashboardSummarySchema,
-        preHandler: [fastify.authenticate]
+        schema: dashboardSummarySchema
     }, async (request, reply) => {
         const { start_date, end_date, repository } = request.query as any;
 

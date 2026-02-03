@@ -49,9 +49,6 @@ jest.unstable_mockModule('../../src/utils/env.js', () => ({
     }
 }));
 
-import { env } from '../../src/utils/env.js';
-// We don't import prisma here anymore, we use mockPrisma
-
 describe('GET /api/dashboard/summary', () => {
     let serverInstance: any;
     const API_KEY = 'test-key-123';

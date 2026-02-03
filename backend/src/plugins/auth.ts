@@ -12,7 +12,7 @@ export default fp(async function authPlugin(fastify: FastifyInstance) {
                 message: 'Invalid or missing API Key',
                 statusCode: 401
             });
-            throw new Error('Unauthorized');
+            return;
         }
     });
 });
