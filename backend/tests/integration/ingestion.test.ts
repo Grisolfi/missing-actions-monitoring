@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { jest, describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 
 // Mocks must be at the top level
 jest.unstable_mockModule('../../src/utils/github-webhook.js', () => ({
@@ -9,15 +9,35 @@ jest.unstable_mockModule('../../src/utils/github-webhook.js', () => ({
     }),
 }));
 
+jest.unstable_mockModule('ioredis', () => ({
+    Redis: jest.fn<any>().mockImplementation(() => ({
+        set: jest.fn<() => Promise<string | null>>().mockResolvedValue('OK'),
+        on: jest.fn<any>(),
+        quit: jest.fn<any>().mockResolvedValue(undefined),
+    })),
+}));
+
 jest.unstable_mockModule('../../src/models/event.js', () => ({
     findWebhookEventByExternalId: jest.fn<() => Promise<any>>().mockResolvedValue(null),
     createWebhookEvent: jest.fn<() => Promise<any>>().mockResolvedValue({ id: 'test-event-id' }),
+    updateWebhookEventStatus: jest.fn<() => Promise<any>>().mockResolvedValue({}),
 }));
 
 jest.unstable_mockModule('../../src/services/queue.js', () => ({
     eventQueue: {
         add: jest.fn<() => Promise<any>>().mockResolvedValue({}),
     },
+    redisOptions: {
+        maxRetriesPerRequest: null,
+    },
+    GITHUB_EVENT_QUEUE: 'github-event-processing-test',
+    queueConnection: {
+        quit: jest.fn<() => Promise<void>>().mockResolvedValue(),
+    },
+}));
+
+jest.unstable_mockModule('../../src/services/github-ips.js', () => ({
+    getGitHubIPs: jest.fn<() => Promise<string[]>>().mockResolvedValue(['127.0.0.1/32']),
 }));
 
 describe('POST /webhooks/github', () => {
@@ -36,7 +56,25 @@ describe('POST /webhooks/github', () => {
         const response = await serverInstance.inject({
             method: 'POST',
             url: '/webhooks/github',
-            payload: { action: 'requested' },
+            payload: {
+                action: 'requested',
+                workflow_run: {
+                    id: 12345,
+                    name: 'test-workflow',
+                    status: 'queued',
+                    conclusion: null,
+                    head_branch: 'main',
+                    head_sha: 'sha123',
+                    created_at: '2023-01-01T00:00:00Z',
+                    updated_at: '2023-01-01T00:00:00Z',
+                    run_started_at: '2023-01-01T00:00:00Z',
+                },
+                repository: {
+                    id: 1,
+                    full_name: 'test/repo',
+                    html_url: 'https://github.com/test/repo',
+                }
+            },
             headers: {
                 'x-hub-signature-256': 'valid-sig',
                 'x-github-delivery': 'test-delivery-id',
