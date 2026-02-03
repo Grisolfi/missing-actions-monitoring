@@ -2,7 +2,7 @@
 
 ## Decision: Time-Series Aggregation Pattern
 **Decision**: Use PostgreSQL's `date_trunc` and `generate_series` via Prisma raw queries for bucketing.
-**Rationale**: Calculating 30-minute buckets over 24 hours is most efficiently done in the database. `generate_series` ensures we get zeroed buckets even if no data exists for a specific period, satisfying SC-006.
+**Rationale**: Calculating 30-minute buckets over 24 hours is most efficiently done in the database. `generate_series` ensures we get zeroed buckets even if no data exists for a specific period, satisfying FR-006.
 **Alternatives considered**: 
 - In-memory JS aggregation: Simple but inefficient for large datasets (SC-001) and complex to fill gaps (zeroed buckets).
 - Prisma `.groupBy`: Easier to use but doesn't handle empty buckets natively and has limited support for complex time-based grouping without raw SQL.
