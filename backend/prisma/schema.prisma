@@ -40,6 +40,11 @@ model WorkflowRun {
   duration       Int?          // Seconds
   waitTime       Int?          // Seconds
   jobs           WorkflowJob[]
+
+  @@index([repositoryName])
+  @@index([startedAt])
+  @@index([completedAt])
+  @@index([status])
 }
 
 model WorkflowJob {

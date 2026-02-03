@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: Dashboard Metrics API
+  version: 1.0.0
+  description: Unified endpoint for GitHub Actions monitoring metrics.
+
+paths:
+  /api/dashboard/summary:
+    get:
+      summary: Get organization-wide dashboard metrics
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: start_date
+          in: query
+          description: ISO 8601 start timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: end_date
+          in: query
+          description: ISO 8601 end timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: repository
+          in: query
+          description: Filter by repository name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current_state:
+                    type: object
+                    properties:
+                      running:
+                        type: integer
+                      queued:
+                        type: integer
+                  aggregates:
+                    type: object
+                    properties:
+                      average_wait_time:
+                        type: number
+                      average_duration:
+                        type: number
+                      total_executions:
+                        type: integer
+                      success_rate:
+                        type: number
+                        description: Percentage 0-100
+                  time_series:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                        success_rate:
+                          type: number
+                        average_duration:
+                          type: number
+        '401':
+          description: Unauthorized (Invalid or missing API Key)
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
